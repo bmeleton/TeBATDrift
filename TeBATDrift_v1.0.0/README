@@ -1,0 +1,145 @@
+# TeBATDrift v1.0.0
+
+A Garfield++ / Magboltz-based electron drift and resolution simulation for TPC gas studies.
+
+This software computes physically meaningful electron transport quantities in gases under a constant electric field and is designed to support validation, detector studies, and batch production on a Condor-based cluster.
+
+It currently simulates:
+
+- mean drift time vs drift distance
+- drift velocity
+- transverse position resolution
+- longitudinal position spread
+- drift-time resolution
+
+It is intended as a clean, modern replacement for older drift pipelines while remaining easy to validate against known Garfield++ / Magboltz benchmark gases.
+
+---
+
+# 1. Main features
+
+## Physics capabilities
+The current version can:
+
+- load or generate Magboltz gas tables
+- simulate electron drift in a constant field using Garfield++
+- scan over many drift heights
+- compute:
+  - mean drift time
+  - endpoint spread in x
+  - endpoint spread in z
+  - spread in drift time
+
+## Analysis capabilities
+A companion Python script reads the simulation output and produces:
+
+- mean drift time vs drift height
+- time resolution vs drift height
+- position resolution vs drift height
+
+It also performs simple fits to estimate:
+
+- drift velocity
+- drift-time resolution coefficient
+- position-resolution coefficient
+
+## Parallel workflow support
+The software now supports **Condor-based parallel scanning** by allowing each run to process only a subset of the drift-height steps.
+
+This is the current replacement for the old Spark-style parallelism.
+
+---
+
+# 2. Important note on “multithreading”
+
+## Does this software use multithreading internally?
+**No.**
+
+The program is still **single-threaded internally**.
+
+It does **not** currently:
+- spawn C++ threads
+- use OpenMP
+- run multiple Garfield drift objects simultaneously in one process
+
+## What parallelism does it use now?
+It now supports **Condor job-level parallelism**.
+
+That means:
+
+- multiple independent jobs are submitted
+- each job runs a different subset of drift-height steps
+- each job writes a partial output file
+- a merge script combines them into one final output
+
+## Why this was chosen
+This approach is currently preferred because it is:
+
+- simpler
+- safer
+- easier to debug
+- naturally compatible with your cluster
+- less likely to run into Garfield thread-safety issues
+
+So while this is not “internal multithreading,” it **does provide parallel execution** across the cluster.
+
+---
+
+# 3. Current limitations
+
+This version is intentionally simple and validation-focused.
+
+## Current assumptions
+The current code assumes:
+
+- a **uniform electric field**
+- a **simple box geometry**
+- no imported electric field map
+- no magnetic field
+- no HEED primary ionization
+- no avalanche gain modeling beyond transport
+- no signal induction or electronics shaping
+
+## Current computational model
+It uses:
+
+- Garfield++ `MediumMagboltz`
+- Garfield++ `ComponentConstant`
+- Garfield++ `Sensor`
+- Garfield++ `AvalancheMC`
+
+Electrons are launched from:
+
+- `(x, y, z) = (0, height, 0)`
+
+with the electric field applied along the `+y` direction.
+
+---
+
+# 4. Directory structure
+
+A typical software layout is:
+
+```text
+TeBATDrift_v1.0.0/
+├── CMakeLists.txt
+├── README.md
+├── setup_env.csh
+├── build/
+├── src/
+│   └── main.cpp
+├── config/
+│   ├── drift_config.json
+│   ├── debug_test.json
+│   └── ...
+├── gas/
+│   └── *.gas
+├── output/
+│   └── *.out
+├── scripts/
+│   ├── plot_drift_summary.py
+│   └── merge_drift_outputs.py
+└── condor/
+    ├── run_drift_job.csh
+    ├── drift_scan.sub
+    └── logs/

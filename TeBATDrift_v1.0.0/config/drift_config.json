@@ -1,0 +1,12 @@
+{
+  "temperature" : 293.15,
+  "pressure"    : 300.0,
+  "eField"      : 200.0,
+  "composition" : ["ic4h10", 100.0, "co2", 0.0],
+  "gasFile"     : "gas/isobutane_100_293p15K_300Torr_200Vcm.gas",
+  "iterations"  : 10000,
+  "minHeight"   : 0.5,
+  "numSteps"    : 20,
+  "stepSize"    : 0.5,
+  "outputFile"  : "output/driftSim.out"
+}

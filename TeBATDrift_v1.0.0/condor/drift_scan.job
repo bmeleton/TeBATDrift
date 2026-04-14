@@ -1,0 +1,17 @@
+Universe        = vanilla
+Executable      = /home/grgroup/bmeleton/bmeleton_data/TeBATDrift_v1.0.0/condor/run_drift_job.csh
+GetEnv          = True
+Notification    = Never
+
+Log             = /home/grgroup/bmeleton/bmeleton_data/TeBATDrift_v1.0.0/condor/logs/drift.$(Cluster).$(Process).log
+Output          = /home/grgroup/bmeleton/bmeleton_data/TeBATDrift_v1.0.0/condor/logs/drift.$(Cluster).$(Process).out
+Error           = /home/grgroup/bmeleton/bmeleton_data/TeBATDrift_v1.0.0/condor/logs/drift.$(Cluster).$(Process).err
+
+Arguments       = /home/grgroup/bmeleton/bmeleton_data/TeBATDrift_v1.0.0/config/drift_config.json $(STARTSTEP) $(ENDSTEP) /home/grgroup/bmeleton/bmeleton_data/TeBATDrift_v1.0.0/output/drift_part_$(Process).out
+
+queue STARTSTEP, ENDSTEP from (
+0 4
+5 9
+10 14
+15 19
+)

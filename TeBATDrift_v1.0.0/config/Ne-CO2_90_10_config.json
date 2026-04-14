@@ -1,0 +1,12 @@
+{
+  "temperature" : 293.15,
+  "pressure"    : 730.0,
+  "eField"      : 400.0,
+  "composition" : ["ne", 90.0, "co2", 10.0],
+  "gasFile"     : "gas/ne90_co210_293K_760Torr_400Vcm.gas",
+  "iterations"  : 200,
+  "minHeight"   : 0.5,
+  "numSteps"    : 20,
+  "stepSize"    : 0.5,
+  "outputFile"  : "output/ne90_co210_293K_760Torr_400Vcm.out"
+}

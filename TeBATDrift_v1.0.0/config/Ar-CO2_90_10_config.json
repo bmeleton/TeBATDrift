@@ -1,0 +1,12 @@
+{
+  "temperature" : 293.15,
+  "pressure"    : 760.0,
+  "eField"      : 400.0,
+  "composition" : ["ar", 90.0, "co2", 10.0],
+  "gasFile"     : "gas/ar90_co210_293K_760Torr_400Vcm.gas",
+  "iterations"  : 200,
+  "minHeight"   : 0.5,
+  "numSteps"    : 20,
+  "stepSize"    : 0.5,
+  "outputFile"  : "output/ar90_co210_293K_760Torr_400Vcm.out"
+}

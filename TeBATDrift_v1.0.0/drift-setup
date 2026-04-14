@@ -1,0 +1,106 @@
+#!/bin/tcsh
+
+# ============================================================
+# TeBATDrift environment setup for tcsh/csh
+#
+# Usage:
+#   source setup_env.csh
+#
+# This script:
+#   1. defines the Garfield++ install path
+#   2. sources the Garfield++ setup script if present
+#   3. sets LD_LIBRARY_PATH
+#   4. sets CMAKE_PREFIX_PATH
+#   5. defines a project root variable
+# ============================================================
+
+# -----------------------------
+# Project root
+# -----------------------------
+setenv TEBATDRIFT_ROOT /home/grgroup/bmeleton/bmeleton_data/TeBATDrift_v1.0.0
+
+# -----------------------------
+# Garfield++ install location
+# -----------------------------
+setenv GARFIELD_INSTALL /home/grgroup/bmeleton/bmeleton_data/personal_softwares/install/garfieldpp
+
+# -----------------------------
+# Source Garfield++ setup script if it exists
+# -----------------------------
+if ( -f "${GARFIELD_INSTALL}/share/Garfield/setupGarfield.csh" ) then
+    source "${GARFIELD_INSTALL}/share/Garfield/setupGarfield.csh"
+else if ( -f "${GARFIELD_INSTALL}/share/Garfield/setupGarfield.sh" ) then
+    echo "WARNING: Found setupGarfield.sh but not setupGarfield.csh."
+    echo "         tcsh cannot directly source .sh files safely."
+    echo "         Proceeding with manual environment setup below."
+else
+    echo "WARNING: No Garfield setup script found under ${GARFIELD_INSTALL}/share/Garfield"
+endif
+
+# -----------------------------
+# HEED database
+# -----------------------------
+if ( -d "${GARFIELD_INSTALL}/share/Heed/database" ) then
+    setenv HEED_DATABASE "${GARFIELD_INSTALL}/share/Heed/database"
+endif
+
+# -----------------------------
+# CMAKE_PREFIX_PATH
+# -----------------------------
+if ( $?CMAKE_PREFIX_PATH ) then
+    setenv CMAKE_PREFIX_PATH "${GARFIELD_INSTALL}:${CMAKE_PREFIX_PATH}"
+else
+    setenv CMAKE_PREFIX_PATH "${GARFIELD_INSTALL}"
+endif
+
+# -----------------------------
+# LD_LIBRARY_PATH
+# -----------------------------
+set _new_ld = ""
+
+if ( -d "${GARFIELD_INSTALL}/lib64" ) then
+    set _new_ld = "${GARFIELD_INSTALL}/lib64"
+endif
+
+if ( -d "${GARFIELD_INSTALL}/lib" ) then
+    if ( "$_new_ld" == "" ) then
+        set _new_ld = "${GARFIELD_INSTALL}/lib"
+    else
+        set _new_ld = "${GARFIELD_INSTALL}/lib:${_new_ld}"
+    endif
+endif
+
+if ( "$_new_ld" != "" ) then
+    if ( $?LD_LIBRARY_PATH ) then
+        setenv LD_LIBRARY_PATH "${_new_ld}:${LD_LIBRARY_PATH}"
+    else
+        setenv LD_LIBRARY_PATH "${_new_ld}"
+    endif
+endif
+
+# -----------------------------
+# Optional: add build dir to PATH
+# -----------------------------
+if ( $?PATH ) then
+    setenv PATH "${TEBATDRIFT_ROOT}/build:${PATH}"
+else
+    setenv PATH "${TEBATDRIFT_ROOT}/build"
+endif
+
+# -----------------------------
+# Helpful status printout
+# -----------------------------
+echo ""
+echo "TeBATDrift environment loaded."
+echo "  TEBATDRIFT_ROOT  = ${TEBATDRIFT_ROOT}"
+echo "  GARFIELD_INSTALL = ${GARFIELD_INSTALL}"
+if ( $?HEED_DATABASE ) then
+    echo "  HEED_DATABASE    = ${HEED_DATABASE}"
+endif
+if ( $?CMAKE_PREFIX_PATH ) then
+    echo "  CMAKE_PREFIX_PATH= ${CMAKE_PREFIX_PATH}"
+endif
+if ( $?LD_LIBRARY_PATH ) then
+    echo "  LD_LIBRARY_PATH  = ${LD_LIBRARY_PATH}"
+endif
+echo ""s
